@@ -15,51 +15,71 @@ function victoryCheck() {
     [2, 4, 6]
   ];
 
-  // Check for draw
-  let allCellsFilled = true;
-  for (let cell of gridCells) {
-    if (cell.innerHTML === "") {
-      allCellsFilled = false;
+  let someoneWon = false;
+
+  for (let combination of winningCombinations) {
+    let a = gridCells[combination[0]].innerHTML;
+    let b = gridCells[combination[1]].innerHTML;
+    let c = gridCells[combination[2]].innerHTML;
+
+    if (a !== "" && a === b && b === c) {
+      let winnerSymbol = a.includes("x") ? "X" : "O";
+
+      gameOverElement.innerHTML = `
+        <div class="result-text">
+            Player ${winnerSymbol} wins!
+        </div>
+        <button class="restart-btn" onclick="window.location.reload()">
+            Restart Game
+        </button>
+      `;
+      gameOverElement.style.visibility = "visible";
+      someoneWon = true;
+      gameOver = true;
       break;
     }
   }
 
-  for (let combination of winningCombinations) {
-    if (gridCells[combination[0]].innerHTML === gridCells[combination[1]].innerHTML && gridCells[combination[1]].innerHTML === gridCells[combination[2]].innerHTML && gridCells[combination[0]].innerHTML !== "") {
-      gameOverElement.innerHTML = `
-    <div class="result-text">
-        Player ${shape === 'cross' ? 'X' : 'O'} wins!
-    </div>
-    <button class="restart-btn" onclick="window.location.reload()">
-        Restart Game
-    </button>
-`;
-      gameOverElement.style.visibility = "visible";
-      gameOver = true;
+  // Draw check
+  if (!someoneWon) {
+    let allCellsFilled = true;
+    for (let cell of gridCells) {
+      if (cell.innerHTML === "") {
+        allCellsFilled = false;
+        break;
+      }
     }
-    else if (allCellsFilled) {
-        gameOverElement.innerHTML = `
+
+    if (allCellsFilled) {
+      gameOverElement.innerHTML = `
         <div class="result-text">
           It's a draw!
         </div>
-    <button class="restart-btn" onclick="window.location.reload()">
-        Restart Game
-    </button>`;
-        gameOverElement.style.visibility = "visible";
-        gameOver = true;
+        <button class="restart-btn" onclick="window.location.reload()">
+          Restart Game
+        </button>`;
+      gameOverElement.style.visibility = "visible";
+      gameOver = true;
     }
   }
 
-  if (gameOver) document.querySelectorAll('.grid-cell').style.pointerEvents = "none";
+  if (gameOver) {
+    for (let cell of gridCells) {
+      cell.style.pointerEvents = "none";
+    }
+  }
 }
 
-for (let cell of gridCells) cell.addEventListener("click", function () {
-  if (!gameOver) {
-    if (cell.innerHTML == "") {
-      if (shape == 'cross') cell.innerHTML = "<img src='https://clipartcraft.com/images/x-transparent-big-1.png' alt='x'></img>";
-      else if (shape == 'circle') cell.innerHTML = "<img src='https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fmarufrahman.com%2Ftic-tac-toe%2Fimg%2Fcircle.png&f=1&nofb=1&ipt=c88ea90a8613094484dc4fef6d0d6bb46156dd0a3e9397b9b693b7d34f215572&ipo=images' alt='o'></img>";
+for (let cell of gridCells) {
+  cell.addEventListener("click", function () {
+    if (!gameOver && cell.innerHTML == "") {
+      if (shape == 'cross') {
+        cell.innerHTML = "<img src='./images/cross.png' alt='x'></img>";
+      } else {
+        cell.innerHTML = "<img src='./images/circle.png' alt='o'></img>";
+      }
       victoryCheck();
       shape = shape === 'cross' ? 'circle' : 'cross';
     }
-  }
-});
+  });
+}
